@@ -52,52 +52,31 @@ impl Snake {
         (next_x, next_y)
     }
     pub fn move_forward(&mut self) -> bool {
-        let mut return_val = false;
+        let mut return_val: bool = false;
         let mut next_x = self.body[0].x as isize;
         let mut next_y = self.body[0].y as isize;
         let body_len = self.body.len();
         match self.body[0].direction {
             Direction::Up => {
                 next_y -= 1;
-                (next_x, next_y) = self.try_teleport(next_x, next_y);
-                if !self.body.iter().any(|&bit| bit.x==next_x as usize && bit.y==next_y as usize) {
-                    (self.body[body_len-1].x, self.body[body_len-1].y) = (next_x as usize, next_y as usize);
-                    return_val = true;
-                } else {
-                    return_val = false;
-                }
             }
             Direction::Down => {
                 next_y += 1;
-                (next_x, next_y) = self.try_teleport(next_x, next_y);
-                if !self.body.iter().any(|&bit| bit.x==next_x as usize && bit.y==next_y as usize) {
-                    (self.body[body_len-1].x, self.body[body_len-1].y) = (next_x as usize, next_y as usize);
-                    return_val = true;
-                } else {
-                    return_val = false;
-                }
             }
             Direction::Left => {
                 next_x -= 1;
-                (next_x, next_y) = self.try_teleport(next_x, next_y);
-                if !self.body.iter().any(|&bit| bit.x==next_x as usize && bit.y==next_y as usize) {
-                    (self.body[body_len-1].x, self.body[body_len-1].y) = (next_x as usize, next_y as usize);
-                    return_val = true;
-                } else {
-                    return_val = false;
-                }
             }
             Direction::Right => {
                 next_x += 1;
-                (next_x, next_y) = self.try_teleport(next_x, next_y);
-                if !self.body.iter().any(|&bit| bit.x==next_x as usize && bit.y==next_y as usize) {
-                    (self.body[body_len-1].x, self.body[body_len-1].y) = (next_x as usize, next_y as usize);
-                    return_val = true;
-                } else {
-                    return_val = false;
-                }
             }
-            _ => return_val = false
+            _ => {return_val = false; return return_val;}
+        }
+        (next_x, next_y) = self.try_teleport(next_x, next_y);
+        if !self.body.iter().any(|&bit| bit.x==next_x as usize && bit.y==next_y as usize) {
+            (self.body[body_len-1].x, self.body[body_len-1].y) = (next_x as usize, next_y as usize);
+            return_val = true;
+        } else {
+            return_val = false;
         }
         return_val
     }
