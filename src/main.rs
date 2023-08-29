@@ -57,10 +57,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             },
         }
 
-        let drawables: Vec<&dyn Drawable> = vec![&snake, &apples];
-        for drawable in drawables {
-            drawable.draw(&mut current_frame);
-        }
+        // let drawables: Vec<&dyn Drawable> = vec![&snake, &apples];
+        // for drawable in drawables {
+        //     drawable.draw(&mut current_frame);
+        // }
+        snake.draw(&mut current_frame);
+        apples.draw(&mut current_frame);
+
+        let _ = render_tx.send(current_frame);
     }
 
     Ok(())
