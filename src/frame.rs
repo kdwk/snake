@@ -24,5 +24,5 @@ pub fn render(stdout: &mut Stdout, last_frame: &Frame, frame: Frame) -> Frame { 
 }
 
 pub trait Drawable {
-    fn draw(self, frame: &mut Frame);
+    fn draw(&mut self, frame: &mut Frame);
 }

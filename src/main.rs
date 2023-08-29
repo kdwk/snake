@@ -1,7 +1,7 @@
 use crossterm::{QueueableCommand, style::{SetBackgroundColor, Color}, event::{Event, KeyCode, self}, terminal::{self, EnterAlternateScreen, LeaveAlternateScreen, Clear, ClearType}, cursor::{Show, Hide}, ExecutableCommand};
 use crossbeam::{channel, epoch::Pointable};
-use snake::{frame::{self, render}, snake::Snake, apple::Apples};
-use std::{error::Error, io::{self, Write}, thread, time::{Duration, Instant}};
+use snake::{frame::{self, render, Frame, Drawable}, snake::{Snake, DidEatApple, Health}, apple::Apples};
+use std::{error::Error, io::{self, Write}, thread, time::{Duration, Instant}, vec};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut stdout = io::stdout();
@@ -26,12 +26,41 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    let snake = Snake::new();
-    let apples = Apples::init();
-    let score: usize = 0;
+    let mut snake = Snake::new();
+    let mut apples = Apples::init();
+    let mut score: usize = 0;
 
     'gameloop: loop {
-        todo!()
+        let mut current_frame = Frame::new();
+        while event::poll(Duration::default())? {
+            let event = event::read()?;
+            match event {
+                Event::Key(key_event) => match key_event.code {
+                    KeyCode::Esc => break 'gameloop,
+                    KeyCode::Left => snake.move_left(),
+                    KeyCode::Right => snake.move_right(),
+                    KeyCode::Down => snake.move_down(),
+                    KeyCode::Up => snake.move_up(),
+                    _ => {}
+                },
+                _ => {} // Ignore if not key event
+            }
+        }
+
+        match snake.move_forward(&mut apples) {
+            Ok(did_eat_apple) => match did_eat_apple {
+                DidEatApple::True => score += 1,
+                DidEatApple::False => {},
+            },
+            Err(health_status) => match health_status {
+                Health::Dead => break 'gameloop,
+            },
+        }
+
+        let drawables: Vec<&dyn Drawable> = vec![&snake, &apples];
+        for drawable in drawables {
+            drawable.draw(&mut current_frame);
+        }
     }
 
     Ok(())

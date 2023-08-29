@@ -55,8 +55,8 @@ impl Apples {
 }
 
 impl Drawable for Apples {
-    fn draw(self, frame: &mut Frame) {
-        for apple in self.list {
+    fn draw(&mut self, frame: &mut Frame) {
+        for apple in &self.list {
             if frame[apple.x][apple.y] == " " {
                 frame[apple.x][apple.y] = "🍎";
             }
