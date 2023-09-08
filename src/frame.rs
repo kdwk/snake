@@ -14,10 +14,8 @@ pub fn new() -> Frame {
 pub fn render(stdout: &mut Stdout, last_frame: &Frame, frame: Frame) -> Frame { // Returns the used frame
     for (x, col) in frame.iter().enumerate() {
         for (y, &char) in col.iter().enumerate() {
-            if last_frame[x][y] != char {
-                stdout.queue(MoveTo(x as u16, y as u16)).unwrap();
-                print!("{}", char);
-            }
+            stdout.queue(MoveTo(x as u16, y as u16)).unwrap();
+            print!("{}", char);
         }
     }
     frame

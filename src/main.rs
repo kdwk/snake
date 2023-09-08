@@ -1,4 +1,4 @@
-use crossterm::{QueueableCommand, style::{SetBackgroundColor, Color}, event::{Event, KeyCode, self}, terminal::{self, EnterAlternateScreen, LeaveAlternateScreen, Clear, ClearType}, cursor::{Show, Hide}, ExecutableCommand};
+use crossterm::{QueueableCommand, style::{SetBackgroundColor, Color}, event::{Event, KeyCode, self}, terminal::{self, EnterAlternateScreen, LeaveAlternateScreen, Clear, ClearType}, cursor::{Show, Hide}, ExecutableCommand, Command};
 use crossbeam::{channel, epoch::Pointable};
 use snake::{frame::{self, render, Frame, Drawable}, snake::{Snake, DidEatApple, Health}, apple::Apples};
 use std::{error::Error, io::{self, Write}, thread, time::{Duration, Instant}, vec};
@@ -49,7 +49,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         match snake.move_forward(&mut apples) {
             Ok(did_eat_apple) => match did_eat_apple {
-                DidEatApple::True => score += 1,
+                DidEatApple::True => {
+                    score += 1;
+                    match snake.insert_back() {
+                        Ok(()) => {},
+                        Err(_health_stat) => break 'gameloop,
+                    };
+                },
                 DidEatApple::False => {},
             },
             Err(health_status) => match health_status {
@@ -65,7 +71,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         apples.draw(&mut current_frame);
 
         let _ = render_tx.send(current_frame);
+        thread::sleep(Duration::from_millis(1));
     }
+    drop(render_tx);
+    render_thread.join().expect("Could not join render_thread");
+    stdout.execute(Show)?;
+    stdout.execute(LeaveAlternateScreen)?;
+    terminal::disable_raw_mode()?;
 
     Ok(())
 }
