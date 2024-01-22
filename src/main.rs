@@ -46,9 +46,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (render_sender, render_receiver) = channel::unbounded::<Frame>();
     let render_thread = thread::spawn(move || {
         let mut out = stdout();
-        out.queue(SetBackgroundColor(Color::Blue))
+        out.queue(Clear(ClearType::All))
             .unwrap()
-            .queue(Clear(ClearType::All))
+            .queue(SetBackgroundColor(Color::Blue))
             .unwrap()
             .flush()
             .unwrap();
@@ -64,8 +64,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
                 thread::sleep(Duration::from_millis(10));
                 continue;
+            } else {
+                break;
             }
-            thread::sleep(Duration::from_millis(10));
+            // thread::sleep(Duration::from_millis(10));
         }
     });
 

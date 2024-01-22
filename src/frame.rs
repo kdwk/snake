@@ -1,12 +1,12 @@
 use std::{
     error::Error,
-    io::{stdout, Stdout, Write},
+    io::{Stdout, Write},
 };
 
-use crossterm::{cursor::MoveTo, style::Print, ExecutableCommand, QueueableCommand};
+use crossterm::{cursor::MoveTo, style::Print, QueueableCommand};
 
-pub const X_NUM_COLS: u16 = 40;
-pub const Y_NUM_ROWS: u16 = 20;
+pub const X_NUM_COLS: u16 = 30;
+pub const Y_NUM_ROWS: u16 = 30;
 
 pub enum Pixel {
     Blank,
@@ -24,43 +24,34 @@ impl From<&Pixel> for String {
     }
 }
 
-struct Dimension {
-    x_num_col: u16,
-    y_num_row: u16,
-}
-
-impl Dimension {
-    fn new(x_num_col: u16, y_num_row: u16) -> Dimension {
-        Dimension {
-            x_num_col,
-            y_num_row,
-        }
-    }
-}
-
-pub struct Frame {
-    dimension: Dimension,
-    content: Vec<Vec<Pixel>>,
-}
+pub struct Frame(Vec<Vec<Pixel>>);
 
 impl Frame {
     pub fn new() -> Frame {
-        Frame {
-            dimension: Dimension::new(X_NUM_COLS, Y_NUM_ROWS),
-            content: (0..Y_NUM_ROWS)
+        Frame(
+            (0..Y_NUM_ROWS)
                 .map(|_| {
                     (0..X_NUM_COLS)
                         .map(|_| Pixel::Blank)
                         .collect::<Vec<Pixel>>()
                 })
                 .collect::<Vec<Vec<Pixel>>>(),
-        }
+        )
+    }
+    fn content(&self) -> &Vec<Vec<Pixel>> {
+        &self.0
+    }
+    fn content_mut(&mut self) -> &mut Vec<Vec<Pixel>> {
+        &mut self.0
     }
     pub fn put(&mut self, x: u16, y: u16, pixel: Pixel) {
-        self.content[y as usize][x as usize] = pixel;
+        self.content_mut()[y as usize][x as usize] = pixel;
     }
     pub fn render(self, out: &mut Stdout) -> Result<(), Box<dyn Error>> {
-        for (y_coordinate, row) in self.content.iter().enumerate() {
+        // out.queue(SetBackgroundColor(Color::Blue))?
+        //     .queue(Clear(ClearType::All))?
+        //     .queue(SetBackgroundColor(Color::Black))?;
+        for (y_coordinate, row) in self.content().iter().enumerate() {
             for (x_coordinate, pixel) in row.iter().enumerate() {
                 out.queue(MoveTo((x_coordinate * 2) as u16, y_coordinate as u16))?
                     .queue(Print(String::from(pixel)))?;
