@@ -25,21 +25,6 @@ use snake::Snake;
 use crate::snake::Direction;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    // let mut snake = Snake::new();
-    // for i in 0..10 {
-    //     if i % 4 == 0 {
-    //         snake.set_direction(Direction::Up);
-    //     } else if i % 4 == 1 {
-    //         snake.set_direction(Direction::Right);
-    //     } else if i % 4 == 2 {
-    //         snake.set_direction(Direction::Down);
-    //     } else {
-    //         snake.set_direction(Direction::Left);
-    //     }
-    //     snake.move_forward()?;
-    //     dbg!(snake.clone());
-    // }
-
     let mut out = stdout();
     terminal::enable_raw_mode()?;
     out.execute(EnterAlternateScreen)?.execute(Hide)?;
@@ -59,15 +44,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         loop {
             if let Ok(frame) = render_receiver.recv() {
                 if let Err(_error) = frame.render(&mut out) {
-                    // eprintln!("{}", error.to_string());
                     break;
                 }
                 thread::sleep(Duration::from_millis(10));
-                continue;
             } else {
                 break;
             }
-            // thread::sleep(Duration::from_millis(10));
         }
     });
 

@@ -48,9 +48,6 @@ impl Frame {
         self.content_mut()[y as usize][x as usize] = pixel;
     }
     pub fn render(self, out: &mut Stdout) -> Result<(), Box<dyn Error>> {
-        // out.queue(SetBackgroundColor(Color::Blue))?
-        //     .queue(Clear(ClearType::All))?
-        //     .queue(SetBackgroundColor(Color::Black))?;
         for (y_coordinate, row) in self.content().iter().enumerate() {
             for (x_coordinate, pixel) in row.iter().enumerate() {
                 out.queue(MoveTo((x_coordinate * 2) as u16, y_coordinate as u16))?

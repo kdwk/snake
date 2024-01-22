@@ -65,48 +65,40 @@ impl Snake {
     fn propose_location(x: u16, y: u16, relative_direction: Direction) -> (u16, u16) {
         let mut proposed_x: i32 = x as i32;
         let mut proposed_y: i32 = y as i32;
-        match relative_direction {
-            Direction::Up => {
-                (proposed_x, proposed_y) = (
-                    proposed_x,
-                    if proposed_y - 1 < 0 {
-                        (Y_NUM_ROWS - 1) as i32
-                    } else {
-                        proposed_y - 1
-                    },
-                )
-            }
-            Direction::Down => {
-                (proposed_x, proposed_y) = (
-                    proposed_x,
-                    if proposed_y + 1 >= Y_NUM_ROWS as i32 {
-                        0 as i32
-                    } else {
-                        proposed_y + 1
-                    },
-                )
-            }
+        proposed_x = match relative_direction {
+            Direction::Up | Direction::Down => proposed_x,
             Direction::Left => {
-                (proposed_x, proposed_y) = (
-                    if proposed_x - 1 < 0 {
-                        (X_NUM_COLS - 1) as i32
-                    } else {
-                        proposed_x - 1
-                    },
-                    proposed_y,
-                )
+                if proposed_x - 1 < 0 {
+                    (X_NUM_COLS - 1) as i32
+                } else {
+                    proposed_x - 1
+                }
             }
             Direction::Right => {
-                (proposed_x, proposed_y) = (
-                    if proposed_x + 1 >= X_NUM_COLS as i32 {
-                        0 as i32
-                    } else {
-                        proposed_x + 1
-                    },
-                    proposed_y,
-                )
+                if proposed_x + 1 >= X_NUM_COLS as i32 {
+                    0 as i32
+                } else {
+                    proposed_x + 1
+                }
             }
-        }
+        };
+        proposed_y = match relative_direction {
+            Direction::Left | Direction::Right => proposed_y,
+            Direction::Up => {
+                if proposed_y - 1 < 0 {
+                    (Y_NUM_ROWS - 1) as i32
+                } else {
+                    proposed_y - 1
+                }
+            }
+            Direction::Down => {
+                if proposed_y + 1 >= Y_NUM_ROWS as i32 {
+                    0 as i32
+                } else {
+                    proposed_y + 1
+                }
+            }
+        };
         (
             proposed_x.try_into().unwrap(),
             proposed_y.try_into().unwrap(),
