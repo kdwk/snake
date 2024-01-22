@@ -66,6 +66,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Down => snake.set_direction(Direction::Down),
                     KeyCode::Left => snake.set_direction(Direction::Left),
                     KeyCode::Right => snake.set_direction(Direction::Right),
+                    KeyCode::Char(' ') => {
+                        if let Err(_) = event::read() {
+                            break 'gameloop;
+                        }
+                    }
                     _ => {}
                 }
             }
