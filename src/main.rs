@@ -24,6 +24,23 @@ use snake::Snake;
 
 use crate::snake::Direction;
 
+#[derive(Debug, Clone, Copy)]
+enum Difficulty {
+    Easy,
+    Medium,
+    Hard,
+}
+
+impl Into<u128> for Difficulty {
+    fn into(self) -> u128 {
+        match self {
+            Difficulty::Easy => 400,
+            Difficulty::Medium => 300,
+            Difficulty::Hard => 200,
+        }
+    }
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let mut out = stdout();
     terminal::enable_raw_mode()?;
@@ -56,6 +73,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut snake = Snake::new();
     let mut apple = Apple::new();
     let mut instant = Instant::now();
+    let mut difficulty = Difficulty::Easy;
+    let mut difficulty_timer = Instant::now();
     'gameloop: loop {
         let mut frame = Frame::new();
         while event::poll(Duration::default())? {
@@ -75,11 +94,19 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
-        if instant.elapsed().as_millis() >= 400 {
+        if instant.elapsed().as_millis() >= difficulty.into() {
             if let Err(_) = snake.move_forward(&mut apple) {
                 break 'gameloop;
             }
             instant = Instant::now();
+        }
+        if difficulty_timer.elapsed().as_secs() >= 30 {
+            match difficulty {
+                Difficulty::Easy => difficulty = Difficulty::Medium,
+                Difficulty::Medium => difficulty = Difficulty::Hard,
+                _ => (),
+            }
+            difficulty_timer = Instant::now();
         }
         snake.draw(&mut frame);
         apple.draw(&mut frame);
